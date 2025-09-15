@@ -1,0 +1,90 @@
+#!/bin/bash -l
+## Nazwa zlecenia
+#SBATCH -J JOBNAME
+## Liczba alokowanych węzłów
+#SBATCH -N 1
+## Liczba zadań per węzeł (domyślnie jest to liczba alokowanych rdzeni na węźle)
+#SBATCH --ntasks-per-node=NCORES
+## Maksymalny czas trwania zlecenia (format HH:MM:SS)
+#SBATCH --time=TIME
+## Liczba RAM (w MB)
+#SBATCH --mem=RAM 
+## Nazwa grantu do rozliczenia zużycia zasobów
+#SBATCH -A GRANTID
+## Specyfikacja partycji
+#SBATCH -p QUEUEID
+## Plik ze standardowym wyjściem
+#SBATCH --output="/net/afscra/people/USERNAME_TO_INPUT/Julia_Few_Molecules/logs/outputs/DTNOW/JOBNAME.log"
+## Plik ze standardowym wyjściem błędów
+#SBATCH --error="/net/afscra/people/USERNAME_TO_INPUT/Julia_Few_Molecules/logs/errors/DTNOW/JOBNAME_err.log"
+
+## Przejście do katalogu, z którego wywołany został sbatch
+cd $SLURM_SUBMIT_DIR
+cd "../"
+
+srun /bin/hostname
+
+## Load required modules for Julia with Intel MKL backend
+# Load Intel compiler and MKL for optimized linear algebra
+module load iimkl/2024a
+
+# Load Julia module
+module load julia/1.10.0
+
+# Verify modules are loaded
+echo "Loaded modules:"
+module list
+
+# Set Julia to use Intel MKL for BLAS operations
+export JULIA_NUM_THREADS=NCORES
+
+# Run Julia program with specified parameters
+echo "========================================="
+echo "Job started at: " $(date)
+echo "Hostname: " $(hostname)
+echo "Working directory: " $(pwd)
+echo "Julia version: " $(julia --version)
+echo "Number of threads: " $JULIA_NUM_THREADS
+echo "Declared memory: RAM MB"
+echo "Declared time: TIME (HH:MM:SS)"
+echo "========================================="
+
+julia --project=. ./src/FewMolecules.jl \
+    MODE.SUBTYPE \
+    GEOMETRY \
+    --E EL_FIELD \
+    --phi_el PHI_EL \
+    --theta_el THETA_EL \
+    --B MG_FIELD \
+    --phi_mg PHI_MG \
+    --theta_mg THETA_MG \
+    --A A_FACTOR \
+    --d_el D_EL \
+    --d_mg D_MG \
+    --Mtot MTOT \
+    --JMAX JMAXval \
+    --spin SPINval \
+    --basis-method "cpp-faithful" \
+    --hamiltonian-method "cpp-faithful" \
+    --hamiltonian-dtype DTYPE \
+    --harmonic-frequency HARMONIC_FREQ \
+    --harmonic-frequency-unit HARMONIC_UNIT \
+    --time-unit T_UNIT \
+    --harmonic-frequency-source "custom" \
+    --save-root-folder "${SCRATCH}/Julia_Few_Molecules/" \
+    --tmax TMAXval \
+    --dt DT_VAL \
+    --quenched_E quenched_E_val \
+    --quenched_R quenched_R_val \
+    --quench-observables OBSERVABLES_LIST\
+    --initial-basis-state BASIS_STATE_NO \
+    --run-id-string IDSTR \
+    --ITS_PER_OVERRIDE ITSNUMOVERRIDE \
+    --IT_NO_OVERRIDE ITNUMVAL \
+    # --profile
+job_status=$?
+
+echo "========================================="
+echo "Job finished at: " $(date)
+echo "Exit status: " $job_status
+echo "========================================="
