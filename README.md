@@ -2,6 +2,8 @@
 
 A high-performance Julia package for quantum mechanical calculations of few interacting magnetic polar molecules in external electric and magnetic fields. This package enables precise numerical studies of ultracold molecular physics, including energy spectra, quantum dynamics, and many-body interactions.
 
+[![DOI](https://zenodo.org/badge/1056820407.svg)](https://doi.org/10.5281/zenodo.17123315)
+
 ## Overview
 
 FewMolecules.jl provides a comprehensive framework for modeling systems of 1-3 interacting magnetic polar molecules, in the description of Hund's case (e). It incorporates:
@@ -330,7 +332,7 @@ If you use FewMolecules.jl in your research, please cite:
   author={[Kacper Cybiński, Anna Dawid, Michał Suchorowski, Michał Tomza]},
   year={2024},
   url={https://github.com/your-org/Few-Magnetic-Polar-Molecules},
-  doi={[DOI to be added after Zenodo submission]}
+  doi={https://doi.org/10.5281/zenodo.17123315}
 }
 ```
 
